@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 #include "Shader.h"
+#include "Mesh.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -45,46 +46,23 @@ int main()
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }    
-
-    /*
-    float vertices[] = {
-        -0.4, 0.6, 0.0,
-        -0.4, 0.4, 0.0,
-        -0.2, 0.6, 0.0,
-        -0.2, 0.4, 0.0,
-        0, 0.6, 0.0,
-        0, 0.4, 0.0,
-        0.2, 0.6, 0.0,
-        0.2, 0.4, 0.0,
-        0.4, 0.6, 0.0,
-        0.4, 0.4, 0.0
-    };
-
-    unsigned int indices[] = {
-        0, 1, 2,
-        3, 2, 1,
-        3, 4, 5,
-        4, 2, 3,
-        5, 6, 7,
-        4, 6, 5,
-        7, 8, 9,
-        8, 7, 6
-    };
-    */
-    
-    
-    std::vector<glm::vec3> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<Vertex> wave_vertices;
+    std::vector<unsigned int> wave_indices;
+    std::vector<Texture> wave_textures;
     int size = 20;
 
     for (int i = 0; i < size; i++)
     {
         for (int j = 0; j < size; j++)
         {
+            Vertex vertex;
             float x = (float)i / (float)size;
             float y = (float)j / (float)size;
             float z = 0;
-            vertices.push_back(glm::vec3(x,y,z));
+            vertex.Position.x = x;
+            vertex.Position.y = y;
+            vertex.Position.z = z;
+            wave_vertices.push_back(vertex);
         }
     }
     
@@ -94,40 +72,18 @@ int main()
         {
             unsigned int v = i*size+j;
 
-            indices.push_back(v);
-            indices.push_back(v+1);
-            indices.push_back(v+size);
+            wave_indices.push_back(v);
+            wave_indices.push_back(v+1);
+            wave_indices.push_back(v+size);
 
-            indices.push_back(v+1);
-            indices.push_back(v+1+size);
-            indices.push_back(v+size);
+            wave_indices.push_back(v+1);
+            wave_indices.push_back(v+1+size);
+            wave_indices.push_back(v+size);
         }
     }
 
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-    
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-    //glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), &indices[0], GL_STATIC_DRAW);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float)*3, (void*)0);
-    glEnableVertexAttribArray(0);
-    
-
     Shader shader("shader.vert", "shader.frag");
-
+    Mesh wave(wave_vertices, wave_indices, wave_textures);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -160,9 +116,7 @@ int main()
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        wave.Draw(shader);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
