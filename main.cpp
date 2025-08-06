@@ -14,6 +14,8 @@ void processInput(GLFWwindow *window);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+glm::vec3 cube_pos = glm::vec3(0.0f, 0.25f, -0.05f);
+
 int main()
 {
     // glfw: initialize and configure
@@ -82,10 +84,57 @@ int main()
         }
     }
 
+    float half = 1 / 2.0f;
+    std::vector<Vertex> cube_vertices;
+    std::vector<unsigned int> cube_indices = {
+        // Front face
+        1, 5, 7,
+        1, 7, 3,
+
+        // Back face
+        0, 2, 6,
+        0, 6, 4,
+
+        // Left face
+        0, 1, 3,
+        0, 3, 2,
+
+        // Right face
+        4, 6, 7,
+        4, 7, 5,
+
+        // Top face
+        2, 3, 7,
+        2, 7, 6,
+
+        // Bottom face
+        0, 4, 5,
+        0, 5, 1
+    };
+    std::vector<Texture> cube_textures;
+    // Generate 8 vertices
+    for (int x = -1; x <= 1; x += 2) {
+        for (int y = -1; y <= 1; y += 2) {
+            for (int z = -1; z <= 1; z += 2) {
+                Vertex vertex;
+                vertex.Position.x = x * half;
+                vertex.Position.y = y * half;
+                vertex.Position.z = z * half;
+                cube_vertices.push_back(vertex);
+            }
+        }
+    }
+
+
+
     Shader shader("shader.vert", "shader.frag");
+    Shader light_cube_shader("cube.vert", "cube.frag");
     Mesh wave(wave_vertices, wave_indices, wave_textures);
+    Mesh light_cube(cube_vertices, cube_indices, cube_textures);
     // render loop
-    // -----------
+    // ----------- 
+
+    glEnable(GL_DEPTH_TEST);  
     while (!glfwWindowShouldClose(window))
     {
         // input
@@ -95,8 +144,8 @@ int main()
         // render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         shader.use();
         // create transformations
@@ -117,6 +166,18 @@ int main()
         shader.setMat4("projection", projection);
 
         wave.Draw(shader);
+         // make sure to initialize matrix to identity matrix first
+
+        light_cube_shader.use();
+        glm::mat4 cube_model         = glm::mat4(1.0f);
+        cube_model = glm::translate(cube_model, cube_pos);
+        cube_model = glm::rotate(cube_model, glm::radians(-50.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        //cube_model = glm::rotate(cube_model, glm::radians(10.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        cube_model = glm::scale(cube_model, glm::vec3(0.1f));
+        light_cube_shader.setMat4("model", cube_model);
+        light_cube_shader.setMat4("view", view);
+        light_cube_shader.setMat4("projection", projection);
+        light_cube.Draw(light_cube_shader);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -136,6 +197,14 @@ void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+        cube_pos += glm::vec3(0.0f, 0.01f, 0.0f);
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+        cube_pos += glm::vec3(0.0f, -0.01f, 0.0f);
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+        cube_pos += glm::vec3(-0.01f, 0.00f, 0.0f);
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+        cube_pos += glm::vec3(0.01f, 0.0f, 0.0f);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
