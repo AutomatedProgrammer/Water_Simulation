@@ -17,7 +17,8 @@ unsigned int load_texture(const char *path);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-glm::vec3 cube_pos = glm::vec3(0.40f, 0.0f, 0.3f);
+//glm::vec3 cube_pos = glm::vec3(0.40f, 0.0f, 0.3f); //Position for when camera is looking down
+glm::vec3 cube_pos = glm::vec3(0.0f, 0.25f, -0.05f);
 
 int main()
 {
@@ -160,13 +161,23 @@ int main()
         glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 view          = glm::mat4(1.0f);
         glm::mat4 projection    = glm::mat4(1.0f);
+        /*
+        model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::translate(model, glm::vec3(-0.7f, -0.7f, 0.0f));
+        model = glm::scale(model, glm::vec3(2.5f));
+        view  = glm::translate(view, glm::vec3(-0.4f, 0.3f, -1.25f));
+        view = glm::rotate(view, glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        THIS STUFF IS TO HAVE THE CAMERA LOOKING DOWN AT THE WAVE.
+        */
+
         model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(model, glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::translate(model, glm::vec3(-0.47f, -0.47f, 0.0f));
-        model = glm::scale(model, glm::vec3(2.5f));
-        view  = glm::translate(view, glm::vec3(-0.4f, 0.3f, -1.25f));
-        view = glm::rotate(view, glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.25f));
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         shader.setFloat("time", glfwGetTime());
