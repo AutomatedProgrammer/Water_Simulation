@@ -6,15 +6,18 @@
 #include <vector>
 #include "Shader.h"
 #include "Mesh.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+unsigned int load_texture(const char *path);
 
 // settings
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-glm::vec3 cube_pos = glm::vec3(0.0f, 0.25f, -0.05f);
+glm::vec3 cube_pos = glm::vec3(0.40f, 0.0f, 0.3f);
 
 int main()
 {
@@ -51,6 +54,11 @@ int main()
     std::vector<Vertex> wave_vertices;
     std::vector<unsigned int> wave_indices;
     std::vector<Texture> wave_textures;
+    Texture texture;
+    texture.type = "texture_diffuse";
+    texture.id = load_texture("water.jpg");
+    texture.path = "water.jpg";
+    wave_textures.push_back(texture);
     int size = 20;
 
     for (int i = 0; i < size; i++)
@@ -64,6 +72,8 @@ int main()
             vertex.Position.x = x;
             vertex.Position.y = y;
             vertex.Position.z = z;
+            vertex.TexCoords.x = x;
+            vertex.TexCoords.y = y;
             wave_vertices.push_back(vertex);
         }
     }
@@ -125,8 +135,6 @@ int main()
         }
     }
 
-
-
     Shader shader("shader.vert", "shader.frag");
     Shader light_cube_shader("cube.vert", "cube.frag");
     Mesh wave(wave_vertices, wave_indices, wave_textures);
@@ -156,7 +164,9 @@ int main()
         model = glm::rotate(model, glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::translate(model, glm::vec3(-0.47f, -0.47f, 0.0f));
-        view  = glm::translate(view, glm::vec3(0.0f, 0.0f, -1.25f));
+        model = glm::scale(model, glm::vec3(2.5f));
+        view  = glm::translate(view, glm::vec3(-0.4f, 0.3f, -1.25f));
+        view = glm::rotate(view, glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
         shader.setFloat("time", glfwGetTime());
@@ -216,3 +226,41 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
+unsigned int load_texture(const char *path)
+{
+    string filename = string(path);
+
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(filename.c_str(), &width, &height, &nrComponents, 0);
+    if (data)
+    {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
+}
