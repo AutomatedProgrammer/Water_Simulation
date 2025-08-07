@@ -60,7 +60,7 @@ int main()
     texture.id = load_texture("water.jpg");
     texture.path = "water.jpg";
     wave_textures.push_back(texture);
-    int size = 20;
+    int size = 100;
 
     for (int i = 0; i < size; i++)
     {
@@ -154,7 +154,7 @@ int main()
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
         shader.use();
         // create transformations

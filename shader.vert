@@ -10,12 +10,18 @@ uniform mat4 view;
 uniform mat4 projection;
 
 uniform float time;
-vec3 Pos;
 
 void main()
 {
+	vec3 Pos;
 	Pos = aPos;
-	Pos.z = 0.1 * sin((2*(Pos.x+Pos.y) + time*1)); 
+	float amplitude = 0.005f;
+	vec2 direction = vec2(0.5f, 1.0f);
+	float frequency = 50.0f;
+	float speed = 1.0f;
+	Pos.z += amplitude * sin(dot(direction, vec2(Pos.x,Pos.y))*frequency + time*speed); 
+	
+	 
 	TexCoords = aTexCoords;
 	gl_Position = projection * view * model * vec4(Pos, 1.0);
 }
