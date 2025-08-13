@@ -18,9 +18,6 @@ unsigned int loadCubemap(std::vector<std::string> faces);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-//glm::vec3 cube_pos = glm::vec3(0.40f, 0.0f, 0.3f); //Position for when camera is looking down
-glm::vec3 cube_pos = glm::vec3(0.0f, 0.25f, -0.05f);
-
 int main()
 {
     // glfw: initialize and configure
@@ -96,47 +93,6 @@ int main()
         }
     }
 
-    float half = 1 / 2.0f;
-    std::vector<Vertex> cube_vertices;
-    std::vector<unsigned int> cube_indices = {
-        // Front face
-        1, 5, 7,
-        1, 7, 3,
-
-        // Back face
-        0, 2, 6,
-        0, 6, 4,
-
-        // Left face
-        0, 1, 3,
-        0, 3, 2,
-
-        // Right face
-        4, 6, 7,
-        4, 7, 5,
-
-        // Top face
-        2, 3, 7,
-        2, 7, 6,
-
-        // Bottom face
-        0, 4, 5,
-        0, 5, 1
-    };
-    std::vector<Texture> cube_textures;
-    // Generate 8 vertices
-    for (int x = -1; x <= 1; x += 2) {
-        for (int y = -1; y <= 1; y += 2) {
-            for (int z = -1; z <= 1; z += 2) {
-                Vertex vertex;
-                vertex.Position.x = x * half;
-                vertex.Position.y = y * half;
-                vertex.Position.z = z * half;
-                cube_vertices.push_back(vertex);
-            }
-        }
-    }
-
     float skyboxVertices[] = {
     // positions          
     -1.0f,  1.0f, -1.0f,
@@ -208,9 +164,7 @@ int main()
     skyboxShader.setInt("skybox", 0);
 
     Shader shader("shader.vert", "shader.frag");
-    Shader light_cube_shader("cube.vert", "cube.frag");
     Mesh wave(wave_vertices, wave_indices, wave_textures);
-    Mesh light_cube(cube_vertices, cube_indices, cube_textures);
     // render loop
     // ----------- 
 
@@ -232,17 +186,6 @@ int main()
         glm::mat4 model         = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 view          = glm::mat4(1.0f);
         glm::mat4 projection    = glm::mat4(1.0f);
-        /*
-        model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        model = glm::translate(model, glm::vec3(-0.7f, -0.7f, 0.0f));
-        model = glm::scale(model, glm::vec3(2.5f));
-        view  = glm::translate(view, glm::vec3(-0.4f, 0.3f, -1.25f));
-        view = glm::rotate(view, glm::radians(50.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
-        THIS STUFF IS TO HAVE THE CAMERA LOOKING DOWN AT THE WAVE.
-        */
 
         model = glm::rotate(model, glm::radians(-70.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(model, glm::radians(0.5f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -259,19 +202,8 @@ int main()
         shader.setMat4("projection", projection);
 
         wave.Draw(shader);
-        
 
-        light_cube_shader.use();
-        glm::mat4 cube_model         = glm::mat4(1.0f);
-        cube_model = glm::translate(cube_model, cube_pos);
-        cube_model = glm::rotate(cube_model, glm::radians(-50.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        //cube_model = glm::rotate(cube_model, glm::radians(10.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        cube_model = glm::scale(cube_model, glm::vec3(0.1f));
-        light_cube_shader.setMat4("model", cube_model);
-        light_cube_shader.setMat4("view", view);
-        light_cube_shader.setMat4("projection", projection);
-        light_cube.Draw(light_cube_shader);
-
+        //Skybox
         
         glDepthFunc(GL_LEQUAL);
         skyboxShader.use();
@@ -304,14 +236,6 @@ void processInput(GLFWwindow *window)
 {
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        cube_pos += glm::vec3(0.0f, 0.01f, 0.0f);
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        cube_pos += glm::vec3(0.0f, -0.01f, 0.0f);
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        cube_pos += glm::vec3(-0.01f, 0.00f, 0.0f);
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        cube_pos += glm::vec3(0.01f, 0.0f, 0.0f);
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
