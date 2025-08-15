@@ -58,7 +58,7 @@ int main()
     texture.id = load_texture("water.jpg");
     texture.path = "water.jpg";
     wave_textures.push_back(texture);
-    int size = 100;
+    int size = 300;
 
     for (int i = 0; i < size; i++)
     {
@@ -200,7 +200,7 @@ int main()
         shader.setMat4("model", model);
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
-
+        shader.setVec3("cameraPos", glm::vec3(0.0f, 0.0f, 0.0f));
         wave.Draw(shader);
 
         //Skybox
