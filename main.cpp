@@ -58,7 +58,7 @@ int main()
     texture.id = load_texture("water.jpg");
     texture.path = "water.jpg";
     wave_textures.push_back(texture);
-    int size = 300;
+    int size = 500;
 
     for (int i = 0; i < size; i++)
     {
