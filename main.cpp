@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 #include "Shader.h"
-#include "Mesh.h"
+#include "WaterMesh.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 
@@ -53,11 +53,6 @@ int main()
     std::vector<Vertex> wave_vertices;
     std::vector<unsigned int> wave_indices;
     std::vector<Texture> wave_textures;
-    Texture texture;
-    texture.type = "texture_diffuse";
-    texture.id = load_texture("water.jpg");
-    texture.path = "water.jpg";
-    wave_textures.push_back(texture);
     int size = 500;
 
     for (int i = 0; i < size; i++)
@@ -164,7 +159,7 @@ int main()
     skyboxShader.setInt("skybox", 0);
 
     Shader shader("shader.vert", "shader.frag");
-    Mesh wave(wave_vertices, wave_indices, wave_textures);
+    WaterMesh wave(wave_vertices, wave_indices, wave_textures);
     // render loop
     // ----------- 
 
@@ -201,7 +196,7 @@ int main()
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
         shader.setVec3("cameraPos", glm::vec3(0.0f, 0.0f, 0.0f));
-        wave.Draw(shader);
+        wave.Draw(shader, cubemapTexture);
 
         //Skybox
         
