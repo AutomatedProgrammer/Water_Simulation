@@ -3,3 +3,5 @@ Water simulation made in OpenGL. Libraries used are GLFW, GLAD, stb_image, and G
 Demo Footage: https://youtu.be/C3oWhjHNgvI (App capture)
 
 https://youtu.be/wlmv65oMn-c (Desktop Recording)
+
+![alt text](https://github.com/AutomatedProgrammer/Water_Simulation/blob/main/WaterDemo.png?raw=true)
