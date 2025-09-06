@@ -179,8 +179,6 @@ int main()
         shader.setMat4("projection", projection);
         shader.setVec3("cameraPos", glm::vec3(0.0f, 0.0f, 0.0f));
         wave.Draw(shader, cubemapTexture);
-
-        //Skybox
         
         glDepthFunc(GL_LEQUAL);
         skyboxShader.use();
